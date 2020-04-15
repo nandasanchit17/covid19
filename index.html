@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corona Virus (COVID19) Tracker</title>
+  <link rel="shortcut icon" href="assets/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-161937150-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-161937150-1');
+</script>
+</head>
+
+<body ng-app="coronatracker" ng-controller="mainController" oncontextmenu="return false;">
+  <div class="container">
+    <div class="row mt30">
+      <div class="col-md-12 text-center">
+        <div class="fs24">COVID - 19 CORONAVIRUS PANDEMIC</div>
+        <div class="fs pb25">Last update on : {{global_stats.lastUpdate | date:'medium'}}</div>
+      </div>
+    </div>
+    <div class="row">
+<!--right-->
+
+      <div class="col-md-3">
+        <div class="row">
+          <div>
+            <div class="glbstatus ff-circular-med">GLOBAL STATS</div>
+          </div>
+        </div>
+        <div class="row mt30">
+          <div class="col-md-12">
+            <div class="recvr mb30">
+              <div class="ff-circular-med touchgrn">RECOVERED</div>
+                 <div class="col-md-9 col-xs-10 col-sm-11"></div>
+              <div class="col-md-3 col-xs-2 col-sm-1"><div class="grndot"></div></div>
+              <div class="fs29 ff-circular-med fc-green">{{global_stats.recovered.value | number}}</div>
+              
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="cnfrmd mb30">
+               <div class="col-md-9 col-xs-10 col-sm-11"></div>
+              <div class="col-md-3 col-xs-2 col-sm-1"><div class="yellordot"></div></div>
+              <div class="fs29 ff-circular-med fc-yellow">{{global_stats.confirmed.value | number}}</div>
+              <div class="ff-circular-med touchylw">CONFIRMED</div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="dead">
+               <div class="col-md-9 col-xs-10 col-sm-11"></div>
+              <div class="col-md-3 col-xs-2 col-sm-1"><div class="rddot"></div></div>
+              <div class="fs29 ff-circular-med fc-red">{{global_stats.deaths.value | number}}</div>
+              <div class="ff-circular-med touchrd">DEAD</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="bgwhite mt60 mbs">
+          <div class="">
+            <div class="logo"><img src="assets/img/bacteria.svg"></div>
+            <div class="headings ff-circular-bold">CORONA TRACKER</div>
+          </div>
+          <div>
+            <hr>
+          </div>
+          <div class="sidebar-col-1-desc-cont">
+            <div class="fs pb25 ff-sfpro-reg">For more up-to-date information on the COVID-19 outbreaks
+              please visit
+              <span><a href="https://www.who.int/emergencies/diseases/novel-coronavirus-2019"
+                  target="_blank">WHO</a></span> </div>
+            <div class="fs pb25">Last update on : {{global_stats.lastUpdate | date:'medium'}}</div>
+          </div>
+        </div> -->
+        
+      </div>
+
+
+<!--left-->
+
+      <div class="col-md-9">
+        <div class="row">
+          <div>
+            <div class="ctrystatus ff-circular-med">
+              COUNTRY STATS</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div>
+              <select name="country" class="form-control slct" ng-model="selected_ctry"
+                ng-change="getcountrystats(selected_ctry)">
+                <option value="" ng-selected="true" ng-disabled="true">Select Country</option>
+                <option ng-repeat="country in countries_list" value="{{country.iso3}}" >
+                  {{country.name}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row mauto" ng-if="!nodata">
+          <div class="col-md-12 white">
+            <div class="col-md-4">
+              <div class="bgclr">
+                <div><img src="assets/img/black-and-gray-desk-globe-1249525.jpg"></div>
+                <div class="totlcases">
+                  <div class="heading2 ff-circular-med"><img src="assets/img/pin-icon.png" alt="pin">{{selected_ctry}}</div>
+                  <div class="totalvals ff-circular-med">{{total | number}} TOTAL CASES</div>
+                </div>
+              </div>
+            </div>    
+            <div class="col-md-8 pt60 pbPh">
+              <div class="prgs">
+                <div>
+                  <div id="rec" class="ff-circular-med">RECOVERED</div>
+                  <div id="rvrc" class="ff-circular-med">{{countries_stats.recovered.value | number}}
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar greenPrg" role="progressbar"
+                    aria-valuenow="countries_stats.recovered.value"
+                    aria-valuemin="{{countries_stats.recovered.value}}" aria-valuemax="{{total}}"
+                    ng-style="{'width':rcvrd_perctg}">
+                  </div>
+                </div>
+              </div>
+              <div class="prgs">
+                <div>
+                  <div id="cnf" class="ff-circular-med">CONFIRMED</div>
+                  <div id="cnfrmc" class="ff-circular-med">
+                    {{countries_stats.confirmed.value | number}}</div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar yellowPrg" role="progressbar"
+                    aria-valuenow="countries_stats.deaths.value"
+                    aria-valuemin="{{countries_stats.deaths.value}}" aria-valuemax="{{total}}"
+                    ng-style="{'width':cnfrm_perctg}">
+                  </div>
+                </div>
+              </div>
+              <div class="pds">
+                <div>
+                  <div id="det" class="ff-circular-med">DEAD</div>
+                  <div id="dthc" class="ff-circular-med">{{countries_stats.deaths.value | number}}
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar redPrg" role="progressbar"
+                    ria-valuenow="countries_stats.deaths.value"
+                    aria-valuemin="{{countries_stats.deaths.value}}" aria-valuemax="{{total}}"
+                    ng-style="{'width':deaths_perctg}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" ng-if="nodata">
+          <div class="col-xs-12 white text-center" >
+            <div class="nodata-cont">
+              <div class="nodata-icon">
+                <img src="assets/img/no-data.png" alt="No data">
+              </div>
+              <div class="nodata-desc ff-circular-med" ng-if="selected_ctry != null">
+                Data not available.
+              </div>
+              <div class="nodata-desc" ng-if="selected_ctry == null">Please select a country.</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- <div class="bgwhite mt60">
+          <div class="heading2 ff-circular-bold">PRECAUTIONERY STEPS</div>
+          <div>
+            <hr>
+          </div>
+          <div class="pb30 pt30">
+            <div class="logo"><img src="assets/img/hand.png"></div>
+            <div class="inCnt">Wash your hands frequently</div>
+          </div>
+          <div class="pb30">
+            <div class="logo"><img src="assets/img/house.png"></div>
+            <div class="inCnt">Stay at home to avoid contact.</div>
+          </div>
+          <div class="pb30">
+            <div class="logo"><img src="assets/img/masks.png"></div>
+            <div class="inCnt">Use mask if its necessary</div>
+          </div>
+        
+          <div class="pb30">
+            <div class="logo"><img src="assets/img/croud.png"></div>
+            <div class="inCnt">Maintain social distancing</div>
+          </div>
+        </div> -->
+      </div>
+
+
+    </div><!--row end-->
+
+<div class="row ftr">
+      <div class="col-sm-4 excrin">
+        <div class="">Developed by<a href="https://www.instagram.com/sanchitnanda_" target="_blank"> Sanchit Nanda</a></div>
+      </div>
+      <div class="col-md-8 dataSrc">
+        <div class="">Data sources from <a href="https://coronavirus.jhu.edu/map.html" target="_blank">John Hopkins University</a></div>
+      </div>
+
+    </div>
+  </div>
+<script type="text/javascript" src="assets/js/min.js"></script>
+</body>
+
+
